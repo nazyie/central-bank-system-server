@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+/**
+ * This would be an error response for processor use
+ */
+Route::get('/bad-request', function () { 
+    $response = [
+        'msg' => 'Internal Server Error'
+    ];
+    return response($response, 400);
+})->name('bad-request');
