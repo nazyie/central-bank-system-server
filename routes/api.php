@@ -1,6 +1,11 @@
 <?php
 
+use App\Http\Controllers\ActionController;
+use App\Http\Controllers\AuditTrailController;
+use App\Http\Controllers\LoggerController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,4 +26,8 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::resource('member', MemberController::class);
-Route::resource('user', RoleController::class);
+Route::resource('role', RoleController::class);
+Route::resource('action', ActionController::class);
+Route::resource('user', UserController::class);
+Route::resource('audit-trail', AuditTrailController::class);
+Route::resource('logger', LoggerController::class);

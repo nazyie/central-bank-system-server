@@ -23,7 +23,6 @@ class Member extends Model
 
     public static function getAllObject(Request $request) {
         $results = DynamicListingQueryParam::query('members', $request);
-
         return $results;
     }
 
@@ -31,28 +30,22 @@ class Member extends Model
         $member = new Member();
         $member->fill($payloadJson);
         $member->save();
-
         return $member;
     }
 
-    public static function updateObject(array $payloadJson, string $id) : Member {
-        $member = Member::findOrFail($id);
+    public static function updateObject(array $payloadJson, Member $member) : Member {
         $member->fill($payloadJson);
         $member->update();
-
         return $member;
     }
 
-    public static function deleteObject(string $id) : Member {
-        $member = Member::findOrFail($id);
+    public static function deleteObject(Member $member) : Member {
         $member->delete();
-
         return $member;
     }
 
     public static function findObject(string $id) : Member {
         $member = Member::findOrFail($id);
-
         return $member;
     }
 }

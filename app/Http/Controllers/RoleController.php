@@ -2,17 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Common\LoggerService;
-use App\Constant\Action;
-use App\Constant\ActionConstant;
-use App\Constant\StatusCode;
-use App\Constant\StatusCodeConstant;
-use App\Http\Requests\CreateMemberRequest;
-use App\Http\Requests\UpdateMemberRequest;
-use App\Models\Member;
+use App\Http\Requests\CreateUpdateRoleRequest;
+use App\Models\Role;
 use Illuminate\Http\Request;
 
-class MemberController extends Controller
+class RoleController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,9 +15,7 @@ class MemberController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO: need the user id to initialize the logger info
-        LoggerService::create('Member', 'DUMMY_TEXT', ActionConstant::GET, StatusCodeConstant::OK, 'OK');
-        return Member::getAllObject($request);
+        return Role::getAllObject($request);
     }
 
     /**
@@ -32,9 +24,9 @@ class MemberController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(CreateMemberRequest $request)
+    public function store(CreateUpdateRoleRequest $request)
     {
-        return Member::storeObject($request->all());
+        return Role::storeObject($request->all());
     }
 
     /**
@@ -45,7 +37,7 @@ class MemberController extends Controller
      */
     public function show($id)
     {
-        return Member::findObject($id);
+        return Role::findObject($id);
     }
 
     /**
@@ -55,10 +47,11 @@ class MemberController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateMemberRequest $request, $id)
+    public function update(CreateUpdateRoleRequest $request, $id)
     {
-        $member = Member::findOrFail($id);
-        return Member::updateObject($request->all(), $member);
+        $role = Role::findOrFail($id);
+
+        return Role::updateObject($request->all(), $role);
     }
 
     /**
@@ -69,7 +62,8 @@ class MemberController extends Controller
      */
     public function destroy($id)
     {
-        $member = Member::findOrFail($id);
-        return Member::deleteObject($member);
+        $role = Role::findOrFail($id);
+
+        return Role::deleteObject($role);
     }
 }
