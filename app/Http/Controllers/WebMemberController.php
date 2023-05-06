@@ -23,7 +23,7 @@ class WebMemberController extends Controller
      */
     public function create()
     {
-        //
+        return view('member.create-update-page');
     }
 
     /**
