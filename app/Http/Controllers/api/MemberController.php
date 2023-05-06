@@ -2,11 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Common\LoggerService;
-use App\Constant\Action;
-use App\Constant\ActionConstant;
-use App\Constant\StatusCode;
-use App\Constant\StatusCodeConstant;
 use App\Http\Requests\CreateMemberRequest;
 use App\Http\Requests\UpdateMemberRequest;
 use App\Models\Member;
@@ -21,8 +16,6 @@ class MemberController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO: need the user id to initialize the logger info
-        LoggerService::create('Member', 'DUMMY_TEXT', ActionConstant::GET, StatusCodeConstant::OK, 'OK');
         return Member::getAllObject($request);
     }
 
@@ -57,7 +50,7 @@ class MemberController extends Controller
      */
     public function update(UpdateMemberRequest $request, $id)
     {
-        $member = Member::findOrFail($id);
+        $member = Member::findObject($id);
         return Member::updateObject($request->all(), $member);
     }
 
@@ -69,7 +62,7 @@ class MemberController extends Controller
      */
     public function destroy($id)
     {
-        $member = Member::findOrFail($id);
+        $member = Member::findObject($id);
         return Member::deleteObject($member);
     }
 }

@@ -18,8 +18,9 @@ return new class extends Migration
             $table->string('domain');
             $table->string('action');
             $table->string('status_code');
+            $table->string('record_id')->nullable();
             $table->string('description');
-            $table->string('created_by')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamp('created_at');
         });
     }

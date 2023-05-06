@@ -11,12 +11,12 @@ class AuditTrailService {
     /**
      * Store the record in the audit trail table when any action being create on the record
      */
-    public static function create(string $domain, string $action, $prevRecord, $currentRecord, int $changedBy) {
+    public static function create(string $domain, string $action, $prevRecord, array | null $currentRecord, int $changedBy) {
         $payload = [
             'domain' => Str::upper($domain),
             'action' => $action,
-            'prev_record' => json_encode($prevRecord->toArray()),
-            'current_record' => json_encode($currentRecord->toArray()),
+            'prev_record' => $prevRecord ? $prevRecord->toJson() : null,
+            'current_record' => $currentRecord ? json_encode($currentRecord) : null, // getOriginal() will retrieve the payload as array of value
             'created_by' => $changedBy,
             'created_at' => Carbon::now()
         ];

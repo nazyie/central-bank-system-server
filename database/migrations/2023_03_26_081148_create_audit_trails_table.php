@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('audit_trails', function (Blueprint $table) {
             $table->id();
-            $table->string('model');
+            $table->string('domain');
             $table->string('action');
             $table->string('prev_record', 2000);
             $table->string('current_record', 2000)->nullable();

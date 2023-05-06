@@ -7,4 +7,6 @@ class ActionConstant {
     const UPDATE = 'UPDATE';
     const DELETE = 'DELETE';
     const GET = 'GET';
+    const AUTHENTICATE = 'AUTHENTICATE';
+    const PROCESS = 'PROCESS';
 }

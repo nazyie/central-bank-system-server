@@ -15,7 +15,9 @@ return new class extends Migration
     {
         Schema::create('otp_tokens', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->unsignedBigInteger('owner');
+            $table->string('otp_code');
+            $table->timestamp('created_at');
         });
     }
 
