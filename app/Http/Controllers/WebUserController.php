@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Member;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
-class WebMemberController extends Controller
+class WebUserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,12 +19,17 @@ class WebMemberController extends Controller
      */
     public function index()
     {
-        $members = Member::simplePaginate(10);
+        // $users = User::simplePaginate(10);
+        $users = DB::table('users')
+            ->selectRaw('users.id, users.name, users.email, members.code, roles.name as role_name, users.created_at, users.updated_at')
+            ->leftJoin('members', 'members.id', 'users.member_id')
+            ->leftJoin('roles', 'roles.id', 'users.role_id')
+            ->simplePaginate(10);
 
-        return view('member.index', [
-            'members' => $members,
-            'previousPageUrl' => $members->previousPageUrl(),
-            'nextPageUrl' => $members->nextPageUrl(),
+        return view('user.index', [
+            'users' => $users,
+            'previousPageUrl' => $users->previousPageUrl(),
+            'nextPageUrl' => $users->nextPageUrl(),
         ]);
     }
 
@@ -31,9 +40,14 @@ class WebMemberController extends Controller
      */
     public function create()
     {
-        return view('member.create-update-page', [
+        $roles = Role::select('id', 'name')->get();
+        $members = Member::select('id', 'name', 'code')->get();
+
+        return view('user.create-update-page', [
             'viewMode' => 'edit',
-            'hasValue' => false
+            'hasValue' => false,
+            'roles' => $roles,
+            'members' => $members
         ]);
     }
 
@@ -50,11 +64,14 @@ class WebMemberController extends Controller
 
         $validated = $request->validate([
             'name' => 'required',
-            'code' => 'required',
-            'description' => 'required',
-            'status' => 'required',
-            'member_type' => 'required'
+            'username' => 'required',
+            'email' => 'required',
+            'password' => 'required',
+            'role_id' => 'required',
+            'member_id' => 'required'
         ]);
+
+        $request['password'] = Hash::make($request->password);
 
         if(!$validated) {
             return redirect()->back()
@@ -62,9 +79,9 @@ class WebMemberController extends Controller
                 ->withInput();
         }
 
-        Member::create($request->all());
+        User::create($request->all());
 
-        return redirect('/member');
+        return redirect('/user');
     }
 
     /**
@@ -75,12 +92,16 @@ class WebMemberController extends Controller
      */
     public function show($id)
     {
-        $member = Member::findOrFail($id);
+        $user = User::findOrFail($id);
+        $roles = Role::select('id', 'name')->get();
+        $members = Member::select('id', 'name', 'code')->get();
 
-        return view('member.create-update-page', [
+        return view('user.create-update-page', [
             'viewMode' => 'view',
             'hasValue' => true,
-            'member' => $member
+            'user' => $user,
+            'roles' => $roles,
+            'members' => $members
         ]);
     }
 
@@ -92,12 +113,16 @@ class WebMemberController extends Controller
      */
     public function edit($id)
     {
-        $member = Member::findOrFail($id);
+        $user = User::findOrFail($id);
+        $roles = Role::select('id', 'name')->get();
+        $members = Member::select('id', 'name', 'code')->get();
 
-        return view('member.create-update-page', [
+        return view('user.create-update-page', [
             'viewMode' => 'edit',
             'hasValue' => true,
-            'member' => $member
+            'user' => $user,
+            'roles' => $roles,
+            'members' => $members
         ]);
     }
 
@@ -115,10 +140,11 @@ class WebMemberController extends Controller
 
         $validated = $request->validate([
             'name' => 'required',
-            'code' => 'required',
-            'description' => 'required',
-            'status' => 'required',
-            'member_type' => 'required'
+            'username' => 'required',
+            'email' => 'required',
+            'password' => 'required',
+            'role_id' => 'required',
+            'member_id' => 'required'
         ]);
 
         if(!$validated) {
@@ -127,13 +153,13 @@ class WebMemberController extends Controller
                 ->withInput();
         }
 
-        $member = Member::findOrFail($id);
+        $user = User::findOrFail($id);
 
-        $member->update($request->all());
+        $user->update($request->all());
 
         Session::flash('successAlert', 'The record has successfully updated');
 
-        return redirect('/member');
+        return redirect('/user');
     }
 
     /**
@@ -144,9 +170,9 @@ class WebMemberController extends Controller
      */
     public function destroy($id)
     {
-        $member = Member::findOrFail($id);
+        $user = User::findOrFail($id);
         Session::flash('successAlert', 'The record has successfully deleted');
-        $member->delete();
+        $user->delete();
         return redirect()->back();
     }
 }

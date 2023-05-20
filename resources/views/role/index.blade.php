@@ -21,7 +21,7 @@
         </div>
         <div class="col-12">
             <div class="text-end">
-                <a href="/member/create"><button type="button" class="btn btn-primary px-4 font-weight-bold">+ Add</button></a>
+                <a href="/role/create"><button type="button" class="btn btn-primary px-4 font-weight-bold">+ Add</button></a>
             </div>
         </div>
         <div>
@@ -34,22 +34,22 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">Name</th>
+                                        <th scope="col">Description</th>
                                         <th scope="col">Member Code</th>
-                                        <th scope="col">Status</th>
                                         <th scope="col">Created At</th>
                                         <th scope="col">Updated At</th>
                                         <th scope="col">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                @foreach ($members as $member)
+                                @foreach ($roles as $role)
                                     <tr>
-                                        <th scope="row">{{ $member->id }}</th>
-                                        <td>{{ $member->name }}</td>
-                                        <td>{{ $member->code }}</td>
-                                        <td>{{ $member->status }}</td>
-                                        <td>{{ $member->created_at }}</td>
-                                        <td>{{ $member->updated_at }}</td>
+                                        <th scope="row">{{ $role->id }}</th>
+                                        <td>{{ $role->name }}</td>
+                                        <td>{{ $role->description }}</td>
+                                        <td>{{ $role->code }}</td>
+                                        <td>{{ $role->created_at }}</td>
+                                        <td>{{ $role->updated_at }}</td>
                                         <td>
                                             <div class="dropdown">
                                                 <button class="btn fw-bold" type="button" id="dropdownMenuButton1"
@@ -57,9 +57,9 @@
                                                     ...
                                                 </button>
                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                    <li><a class="dropdown-item" href="/member/{{ $member->id }}/edit">Update</a></li>
-                                                    <li><form action="{{ '/member/'.$member->id }}" method="POST">@csrf @method('DELETE')<button class="dropdown-item">Delete</button></form></li>
-                                                    <li><a class="dropdown-item" href="/member/{{ $member->id }}">View</a></li>
+                                                    <li><a class="dropdown-item" href="/role/{{ $role->id }}/edit">Update</a></li>
+                                                    <li><form action="{{ '/role/'.$role->id }}" method="POST">@csrf @method('DELETE')<button class="dropdown-item">Delete</button></form></li>
+                                                    <li><a class="dropdown-item" href="/role/{{ $role->id }}">View</a></li>
                                                 </ul>
                                             </div>
                                         </td>

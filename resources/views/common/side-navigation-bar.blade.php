@@ -5,28 +5,38 @@
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="#" class="nav-link active" aria-current="page">
-                Home
-            </a>
-        </li>
-        <li>
-            <a href="#" class="nav-link text-dark">
+            <a href="/dashboard" class="nav-link active" aria-current="page">
                 Dashboard
             </a>
         </li>
         <li>
-            <a href="#" class="nav-link text-dark">
-                Orders
+            <a href="/member" class="nav-link text-dark">
+                Member
             </a>
         </li>
         <li>
-            <a href="#" class="nav-link text-dark">
-                Products
+            <a href="/role" class="nav-link text-dark">
+                Role
             </a>
         </li>
         <li>
-            <a href="#" class="nav-link text-dark">
-                Customers
+            <a href="/user" class="nav-link text-dark">
+                User
+            </a>
+        </li>
+        <li>
+            <a href="/transaction" class="nav-link text-dark">
+                Transaction
+            </a>
+        </li>
+        <li>
+            <a href="/audit-trail" class="nav-link text-dark">
+                Audit Trail
+            </a>
+        </li>
+        <li>
+            <a href="/administration" class="nav-link text-dark">
+                Administration
             </a>
         </li>
     </ul>
