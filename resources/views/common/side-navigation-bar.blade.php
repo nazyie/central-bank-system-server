@@ -2,6 +2,9 @@
     <a href="/dashboard" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto pt-5 text-dark text-decoration-none">
         <span class="fs-4">Central Bank System</span>
     </a>
+    <div>
+        <i>( {{ $userProfile->member_name.' - '.$userProfile->member_code }} )</i>
+    </div>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
@@ -51,9 +54,12 @@
     <div class="dropdown">
         <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
             data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://github.com/mdo.png" alt="" width="32" height="32"
-                class="rounded-circle me-2">
-            <strong>{{ Auth::user()->name }}</strong>
+            <img src="https://github.com/mdo.png" alt="" width="38" height="38"
+                class="rounded-circle me-4">
+            <div class="d-flex flex-column me-4">
+                <div><strong>{{ Auth::user()->name }}</strong></div>
+                <div><small>{{ $userProfile->role_name }}</small></div>
+            </div>
         </a>
         <ul class="dropdown-menu dropdown-menu-white text-small shadow">
             <li><a class="dropdown-item" href="#">Profile</li>

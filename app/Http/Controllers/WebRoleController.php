@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AuditTrailService;
 use App\Models\Action;
 use App\Models\Member;
 use App\Models\Role;
@@ -27,11 +28,18 @@ class WebRoleController extends Controller
             ->leftJoin('members', 'roles.member_id', 'members.id')
             ->simplePaginate(10);
 
+        $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
+                        ->leftJoin('roles', 'roles.member_id', 'members.id')
+                        ->where('roles.id', Auth::user()->role_id)
+                        ->where('members.id', Auth::user()->member_id)
+                        ->first();
+
         return view('role.index', [
             'roles' => $roles,
             'previousPageUrl' => $roles->previousPageUrl(),
             'nextPageUrl' => $roles->nextPageUrl(),
-            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get(),
+            'userProfile' => $userProfileInfo
         ]);
     }
 
@@ -45,6 +53,11 @@ class WebRoleController extends Controller
         $memberCodeList = Member::select('id', 'code')->get();
         $functions = Action::select('function')->distinct()->get();
         $actions = Action::get();
+        $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
+                        ->leftJoin('roles', 'roles.member_id', 'members.id')
+                        ->where('roles.id', Auth::user()->role_id)
+                        ->where('members.id', Auth::user()->member_id)
+                        ->first();
 
         return view('role.create-update-page', [
             'viewMode' => 'edit',
@@ -52,7 +65,8 @@ class WebRoleController extends Controller
             'memberCodeList' => $memberCodeList,
             'functions' => $functions,
             'actions' => $actions,
-            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get(),
+            'userProfile' => $userProfileInfo
         ]);
     }
 
@@ -81,6 +95,8 @@ class WebRoleController extends Controller
 
         $roleId = Role::create($request->all());
 
+        AuditTrailService::create('Role', 'Create', json_encode($roleId), null, Auth::id(), Auth::user()->member_id);
+
         foreach($request->all() as $key => $value) {
             if($value == 'true') {
                 RoleActionMapper::create(['role_id' => $roleId->id, 'action_id' => $key]);
@@ -104,6 +120,11 @@ class WebRoleController extends Controller
         $actions = DB::table('actions')
             ->leftJoin(DB::raw('(SELECT role_id, action_id FROM role_action_mappers WHERE role_id = '.$id.') AS role_action_mappers'), 'role_action_mappers.action_id', 'actions.id')
             ->get();
+        $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
+                        ->leftJoin('roles', 'roles.member_id', 'members.id')
+                        ->where('roles.id', Auth::user()->role_id)
+                        ->where('members.id', Auth::user()->member_id)
+                        ->first();
 
         return view('role.create-update-page', [
             'viewMode' => 'view',
@@ -112,7 +133,8 @@ class WebRoleController extends Controller
             'memberCodeList' => $memberCodeList,
             'functions' => $functions,
             'actions' => $actions,
-            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get(),
+            'userProfile' => $userProfileInfo
         ]);
     }
 
@@ -130,6 +152,11 @@ class WebRoleController extends Controller
         $actions = DB::table('actions')
             ->leftJoin(DB::raw('(SELECT role_id, action_id FROM role_action_mappers WHERE role_id = '.$id.') AS role_action_mappers'), 'role_action_mappers.action_id', 'actions.id')
             ->get();
+        $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
+                        ->leftJoin('roles', 'roles.member_id', 'members.id')
+                        ->where('roles.id', Auth::user()->role_id)
+                        ->where('members.id', Auth::user()->member_id)
+                        ->first();
 
         return view('role.create-update-page', [
             'viewMode' => 'edit',
@@ -138,7 +165,8 @@ class WebRoleController extends Controller
             'memberCodeList' => $memberCodeList,
             'functions' => $functions,
             'actions' => $actions,
-            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get(),
+            'userProfile' => $userProfileInfo
         ]);
     }
 
@@ -167,8 +195,11 @@ class WebRoleController extends Controller
         }
 
         $role = Role::findOrFail($id);
+        $prevRole = Role::findOrFail($id);
 
         $role->update($request->all());
+
+        AuditTrailService::create('Role', 'Create', json_encode($prevRole), json_encode($role), Auth::id(), Auth::user()->member_id);
 
         RoleActionMapper::where('role_id', $role->id)->delete();
 
@@ -194,6 +225,7 @@ class WebRoleController extends Controller
         $role = Role::findOrFail($id);
         Session::flash('successAlert', 'The record has successfully deleted');
         $role->delete();
+        AuditTrailService::create('Role', 'Create', json_encode($role), null, Auth::id(), Auth::user()->member_id);
         RoleActionMapper::where('role_id', $id)->delete();
         return redirect()->back();
     }

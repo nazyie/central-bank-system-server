@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Member;
 use App\Models\RoleActionMapper;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,9 +22,16 @@ class WebDashboardController extends Controller
      */
     public function index()
     {
+        $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
+                        ->leftJoin('roles', 'roles.member_id', 'members.id')
+                        ->where('roles.id', Auth::user()->role_id)
+                        ->where('members.id', Auth::user()->member_id)
+                        ->first();
+
         return view('dashboard.index')->with(
             [
-                'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
+                'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get(),
+                'userProfile' => $userProfileInfo
             ]
         );
     }

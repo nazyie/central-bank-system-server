@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\AuditTrailService;
 use App\Models\Member;
 use App\Models\Role;
 use App\Models\RoleActionMapper;
@@ -37,11 +38,18 @@ class WebUserController extends Controller
             ->leftJoin('roles', 'roles.id', 'users.role_id')
             ->simplePaginate(10);
 
+        $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
+                        ->leftJoin('roles', 'roles.member_id', 'members.id')
+                        ->where('roles.id', Auth::user()->role_id)
+                        ->where('members.id', Auth::user()->member_id)
+                        ->first();
+
         return view('user.index', [
             'users' => $users,
             'previousPageUrl' => $users->previousPageUrl(),
             'nextPageUrl' => $users->nextPageUrl(),
-            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get(),
+            'userProfile' => $userProfileInfo
         ]);
     }
 
@@ -54,13 +62,19 @@ class WebUserController extends Controller
     {
         $roles = Role::select('id', 'name')->get();
         $members = Member::select('id', 'name', 'code')->get();
+        $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
+                        ->leftJoin('roles', 'roles.member_id', 'members.id')
+                        ->where('roles.id', Auth::user()->role_id)
+                        ->where('members.id', Auth::user()->member_id)
+                        ->first();
 
         return view('user.create-update-page', [
             'viewMode' => 'edit',
             'hasValue' => false,
             'roles' => $roles,
             'members' => $members,
-            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get(),
+            'userProfile' => $userProfileInfo
         ]);
     }
 
@@ -72,9 +86,6 @@ class WebUserController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO: Need to replace this with actual user id
-        $request->request->add(['created_by' => 1, 'updated_by' => 1]);
-
         $validated = $request->validate([
             'name' => 'required',
             'username' => 'required',
@@ -92,7 +103,9 @@ class WebUserController extends Controller
                 ->withInput();
         }
 
-        User::create($request->all());
+        $user = User::create($request->all());
+
+        AuditTrailService::create('User', 'Create', json_encode($user), null, Auth::id(), Auth::user()->member_id);
 
         return redirect('/user');
     }
@@ -108,6 +121,11 @@ class WebUserController extends Controller
         $user = User::findOrFail($id);
         $roles = Role::select('id', 'name')->get();
         $members = Member::select('id', 'name', 'code')->get();
+        $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
+                        ->leftJoin('roles', 'roles.member_id', 'members.id')
+                        ->where('roles.id', Auth::user()->role_id)
+                        ->where('members.id', Auth::user()->member_id)
+                        ->first();
 
         return view('user.create-update-page', [
             'viewMode' => 'view',
@@ -115,7 +133,8 @@ class WebUserController extends Controller
             'user' => $user,
             'roles' => $roles,
             'members' => $members,
-            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get(),
+            'userProfile' => $userProfileInfo
         ]);
     }
 
@@ -130,6 +149,11 @@ class WebUserController extends Controller
         $user = User::findOrFail($id);
         $roles = Role::select('id', 'name')->get();
         $members = Member::select('id', 'name', 'code')->get();
+        $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
+                        ->leftJoin('roles', 'roles.member_id', 'members.id')
+                        ->where('roles.id', Auth::user()->role_id)
+                        ->where('members.id', Auth::user()->member_id)
+                        ->first();
 
         return view('user.create-update-page', [
             'viewMode' => 'edit',
@@ -137,7 +161,8 @@ class WebUserController extends Controller
             'user' => $user,
             'roles' => $roles,
             'members' => $members,
-            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get(),
+            'userProfile' => $userProfileInfo
         ]);
     }
 
@@ -150,9 +175,6 @@ class WebUserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // TODO: Need to replace this with actual user id
-        $request->request->add(['created_by' => 1, 'updated_by' => 1]);
-
         $validated = $request->validate([
             'name' => 'required',
             'username' => 'required',
@@ -169,8 +191,11 @@ class WebUserController extends Controller
         }
 
         $user = User::findOrFail($id);
+        $userPrev = User::findOrFail($id);
 
         $user->update($request->all());
+
+        AuditTrailService::create('User', 'Update', json_encode($userPrev), json_encode($user), Auth::id(), Auth::user()->member_id);
 
         Session::flash('successAlert', 'The record has successfully updated');
 
@@ -188,6 +213,7 @@ class WebUserController extends Controller
         $user = User::findOrFail($id);
         Session::flash('successAlert', 'The record has successfully deleted');
         $user->delete();
+        AuditTrailService::create('User', 'Delete', json_encode($user), null, Auth::id(), Auth::user()->member_id);
         return redirect()->back();
     }
 }

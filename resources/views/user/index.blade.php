@@ -79,7 +79,7 @@
             </div>
             <hr>
             <div class="fs-6 text-end fst-italic">
-                <small>Record updated as 12 January 2023</small>
+                <small>Record updated as {{ date("Y-m-d",time()) }}</small>
             </div>
         </div>
     </div>
