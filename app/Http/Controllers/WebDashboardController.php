@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\RoleActionMapper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class WebDashboardController extends Controller
 {
+    public function __construct()
+    {
+        //
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -13,7 +20,11 @@ class WebDashboardController extends Controller
      */
     public function index()
     {
-        return view('dashboard.index');
+        return view('dashboard.index')->with(
+            [
+                'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
+            ]
+        );
     }
 
     /**

@@ -18,9 +18,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::resource('sign-in', WebLoginController::class);
+Route::post('sign-out', [WebLoginController::class, 'destroy']);
 
-Route::group(['middleware' => ['web']], function () {
-    Route::resource('sign-in', WebLoginController::class);
+Route::group(['middleware' => ['auth']], function () {
     Route::resource('dashboard', WebDashboardController::class);
     Route::resource('member', WebMemberController::class);
     Route::resource('user', WebUserController::class);

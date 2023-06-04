@@ -1,6 +1,6 @@
 <div id="notification-alert" style="position: fixed; top: 10px; left:0; z-index: 9999; width: 100%;" class="px-5">
-    {{-- @if ($error->any())
-        @foreach ($error->all() as $error)
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
             <div class="d-flex flex-column justify-content-center pt-2 px-5">
                 <div class="alert alert-danger alert-dismissible" role="alert">
                     <div>{{ $error }}</div>
@@ -15,5 +15,5 @@
             const notificationAlert = document.getElementById('notification-alert');
             notificationAlert.style.display = 'none';
         }, 3000);
-    </script> --}}
+    </script>
 </div>

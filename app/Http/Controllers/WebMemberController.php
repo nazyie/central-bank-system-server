@@ -3,11 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Member;
+use App\Models\RoleActionMapper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class WebMemberController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['validate.ability:create-member'])->only('create', 'store');
+        $this->middleware(['validate.ability:update-member'])->only('edit', 'update');
+        $this->middleware(['validate.ability:view-member'])->only('index', 'show');
+        $this->middleware(['validate.ability:delete-member'])->only('destroy');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -21,6 +31,7 @@ class WebMemberController extends Controller
             'members' => $members,
             'previousPageUrl' => $members->previousPageUrl(),
             'nextPageUrl' => $members->nextPageUrl(),
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
         ]);
     }
 
@@ -33,7 +44,8 @@ class WebMemberController extends Controller
     {
         return view('member.create-update-page', [
             'viewMode' => 'edit',
-            'hasValue' => false
+            'hasValue' => false,
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
         ]);
     }
 
@@ -45,8 +57,9 @@ class WebMemberController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO: Need to replace this with actual user id
-        $request->request->add(['created_by' => 1, 'updated_by' => 1]);
+        $userId = Auth::id();
+
+        $request->request->add(['created_by' => $userId, 'updated_by' => $userId]);
 
         $validated = $request->validate([
             'name' => 'required',
@@ -80,7 +93,8 @@ class WebMemberController extends Controller
         return view('member.create-update-page', [
             'viewMode' => 'view',
             'hasValue' => true,
-            'member' => $member
+            'member' => $member,
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
         ]);
     }
 
@@ -97,7 +111,8 @@ class WebMemberController extends Controller
         return view('member.create-update-page', [
             'viewMode' => 'edit',
             'hasValue' => true,
-            'member' => $member
+            'member' => $member,
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
         ]);
     }
 
@@ -110,15 +125,17 @@ class WebMemberController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // TODO: Need to replace this with actual user id
-        $request->request->add(['created_by' => 1, 'updated_by' => 1]);
+        $userId = Auth::id();
+
+        $request->request->add(['updated_by' => $userId]);
 
         $validated = $request->validate([
             'name' => 'required',
             'code' => 'required',
             'description' => 'required',
             'status' => 'required',
-            'member_type' => 'required'
+            'member_type' => 'required',
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
         ]);
 
         if(!$validated) {

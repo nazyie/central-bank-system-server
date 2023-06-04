@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Member;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class WebLoginController extends Controller
 {
@@ -34,7 +39,18 @@ class WebLoginController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $member = Member::where('code', $request->member_code)->first();
+
+        if ($member != null) {
+            if (Auth::attempt(['username' => $request->username, 'password' => $request->password, 'member_id' => $member->id])) {
+                $request->session()->regenerate();
+
+                return redirect('/dashboard');
+            }
+        }
+
+        Session::flash('errorAlert', 'Credentials is incorrect or not exists');
+        return back()->withInput(['username', 'member_code']);
     }
 
     /**
@@ -77,8 +93,14 @@ class WebLoginController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        Auth::logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect('sign-in');
     }
 }

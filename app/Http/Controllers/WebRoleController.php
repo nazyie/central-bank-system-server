@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\RoleActionMapper;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
@@ -30,6 +31,7 @@ class WebRoleController extends Controller
             'roles' => $roles,
             'previousPageUrl' => $roles->previousPageUrl(),
             'nextPageUrl' => $roles->nextPageUrl(),
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
         ]);
     }
 
@@ -49,7 +51,8 @@ class WebRoleController extends Controller
             'hasValue' => false,
             'memberCodeList' => $memberCodeList,
             'functions' => $functions,
-            'actions' => $actions
+            'actions' => $actions,
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
         ]);
     }
 
@@ -61,8 +64,8 @@ class WebRoleController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO: Need to replace this with actual user id
-        $request->request->add(['created_by' => 1, 'updated_by' => 1]);
+        $userId = Auth::id();
+        $request->request->add(['created_by' => $userId, 'updated_by' => $userId]);
 
         $validated = $request->validate([
             'name' => 'required',
@@ -108,7 +111,8 @@ class WebRoleController extends Controller
             'role' => $role,
             'memberCodeList' => $memberCodeList,
             'functions' => $functions,
-            'actions' => $actions
+            'actions' => $actions,
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
         ]);
     }
 
@@ -133,7 +137,8 @@ class WebRoleController extends Controller
             'role' => $role,
             'memberCodeList' => $memberCodeList,
             'functions' => $functions,
-            'actions' => $actions
+            'actions' => $actions,
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
         ]);
     }
 
@@ -146,8 +151,8 @@ class WebRoleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // TODO: Need to replace this with actual user id
-        $request->request->add(['created_by' => 1, 'updated_by' => 1]);
+        $userId = Auth::id();
+        $request->request->add(['updated_by' => $userId]);
 
         $validated = $request->validate([
             'name' => 'required',

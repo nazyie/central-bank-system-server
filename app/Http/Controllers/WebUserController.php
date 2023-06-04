@@ -4,14 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Member;
 use App\Models\Role;
+use App\Models\RoleActionMapper;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
 class WebUserController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware(['validate.ability:create-user'])->only('create', 'store');
+        $this->middleware(['validate.ability:update-user'])->only('edit', 'update');
+        $this->middleware(['validate.ability:view-user'])->only('index', 'show');
+        $this->middleware(['validate.ability:delete-user'])->only('destroy');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -30,6 +41,7 @@ class WebUserController extends Controller
             'users' => $users,
             'previousPageUrl' => $users->previousPageUrl(),
             'nextPageUrl' => $users->nextPageUrl(),
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
         ]);
     }
 
@@ -47,7 +59,8 @@ class WebUserController extends Controller
             'viewMode' => 'edit',
             'hasValue' => false,
             'roles' => $roles,
-            'members' => $members
+            'members' => $members,
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
         ]);
     }
 
@@ -101,7 +114,8 @@ class WebUserController extends Controller
             'hasValue' => true,
             'user' => $user,
             'roles' => $roles,
-            'members' => $members
+            'members' => $members,
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
         ]);
     }
 
@@ -122,7 +136,8 @@ class WebUserController extends Controller
             'hasValue' => true,
             'user' => $user,
             'roles' => $roles,
-            'members' => $members
+            'members' => $members,
+            'sideNavItem' => RoleActionMapper::where('role_id', Auth::user()->role_id)->get()
         ]);
     }
 
