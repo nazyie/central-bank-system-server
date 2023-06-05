@@ -7,7 +7,6 @@ use App\Models\Action;
 use App\Models\Member;
 use App\Models\Role;
 use App\Models\RoleActionMapper;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,11 +21,18 @@ class WebRoleController extends Controller
      */
     public function index()
     {
-        // $roles = Role::simplePaginate(10);
         $roles = DB::table('roles')
             ->selectRaw('roles.id, roles.name, roles.description, roles.created_by, roles.updated_by, roles.created_at, roles.updated_at, members.code')
             ->leftJoin('members', 'roles.member_id', 'members.id')
+            ->where('roles.member_id', Auth::user()->member_id)
             ->simplePaginate(10);
+
+        if (Auth::user()->member_id == 1) {
+            $roles = DB::table('roles')
+                ->selectRaw('roles.id, roles.name, roles.description, roles.created_by, roles.updated_by, roles.created_at, roles.updated_at, members.code')
+                ->leftJoin('members', 'roles.member_id', 'members.id')
+                ->simplePaginate(10);
+        }
 
         $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
                         ->leftJoin('roles', 'roles.member_id', 'members.id')
@@ -50,9 +56,16 @@ class WebRoleController extends Controller
      */
     public function create()
     {
-        $memberCodeList = Member::select('id', 'code')->get();
-        $functions = Action::select('function')->distinct()->get();
-        $actions = Action::get();
+        $memberCodeList = Member::select('id', 'code')->where('id', Auth::user()->member_id)->get();
+        $functions = Action::select('function')->whereNotIn('function', ['Audit Trail'])->distinct()->get();
+        $actions = Action::whereNotIn('function', ['Audit Trail'])->get();
+
+        if(Auth::user()->member_id == 1) {
+            $memberCodeList = Member::select('id', 'code')->get();
+            $functions = Action::select('function')->distinct()->get();
+            $actions = Action::get();
+        }
+
         $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
                         ->leftJoin('roles', 'roles.member_id', 'members.id')
                         ->where('roles.id', Auth::user()->role_id)
@@ -87,6 +100,10 @@ class WebRoleController extends Controller
             'member_id' => 'required',
         ]);
 
+        if ($request->member_id != Auth::user()->member_id) {
+            abort(403);
+        }
+
         if(!$validated) {
             return redirect()->back()
                 ->withErrors($validated)
@@ -115,11 +132,21 @@ class WebRoleController extends Controller
     public function show($id)
     {
         $role = Role::findOrFail($id);
-        $memberCodeList = Member::select('id', 'code')->get();
-        $functions = Action::select('function')->distinct()->get();
+        $memberCodeList = Member::select('id', 'code')->where('id', Auth::user()->member_id)->get();
+        $functions = Action::select('function')->whereNotIn('function', ['Audit Trail'])->distinct()->get();
         $actions = DB::table('actions')
             ->leftJoin(DB::raw('(SELECT role_id, action_id FROM role_action_mappers WHERE role_id = '.$id.') AS role_action_mappers'), 'role_action_mappers.action_id', 'actions.id')
+            ->whereNotIn('function', ['Audit Trail'])
             ->get();
+
+        if(Auth::user()->member_id == 1) {
+            $memberCodeList = Member::select('id', 'code')->get();
+            $functions = Action::select('function')->distinct()->get();
+            $actions = DB::table('actions')
+                ->leftJoin(DB::raw('(SELECT role_id, action_id FROM role_action_mappers WHERE role_id = '.$id.') AS role_action_mappers'), 'role_action_mappers.action_id', 'actions.id')
+                ->get();
+        }
+
         $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
                         ->leftJoin('roles', 'roles.member_id', 'members.id')
                         ->where('roles.id', Auth::user()->role_id)
@@ -147,11 +174,21 @@ class WebRoleController extends Controller
     public function edit($id)
     {
         $role = Role::findOrFail($id);
-        $memberCodeList = Member::select('id', 'code')->get();
-        $functions = Action::select('function')->distinct()->get();
+        $memberCodeList = Member::select('id', 'code')->where('id', Auth::user()->member_id)->get();
+        $functions = Action::select('function')->whereNotIn('function', ['Audit Trail'])->distinct()->get();
         $actions = DB::table('actions')
             ->leftJoin(DB::raw('(SELECT role_id, action_id FROM role_action_mappers WHERE role_id = '.$id.') AS role_action_mappers'), 'role_action_mappers.action_id', 'actions.id')
+            ->whereNotIn('function', ['Audit Trail'])
             ->get();
+
+        if(Auth::user()->member_id == 1) {
+            $memberCodeList = Member::select('id', 'code')->get();
+            $functions = Action::select('function')->distinct()->get();
+            $actions = DB::table('actions')
+                ->leftJoin(DB::raw('(SELECT role_id, action_id FROM role_action_mappers WHERE role_id = '.$id.') AS role_action_mappers'), 'role_action_mappers.action_id', 'actions.id')
+                ->get();
+        }
+
         $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
                         ->leftJoin('roles', 'roles.member_id', 'members.id')
                         ->where('roles.id', Auth::user()->role_id)
@@ -194,6 +231,10 @@ class WebRoleController extends Controller
                 ->withInput();
         }
 
+        if(Auth::user()->member_id != $request->member_id) {
+            abort(403);
+        }
+
         $role = Role::findOrFail($id);
         $prevRole = Role::findOrFail($id);
 
@@ -223,6 +264,9 @@ class WebRoleController extends Controller
     public function destroy($id)
     {
         $role = Role::findOrFail($id);
+        if ($role->member_id !== Auth::user()->member_id) {
+            abort(403);
+        }
         Session::flash('successAlert', 'The record has successfully deleted');
         $role->delete();
         AuditTrailService::create('Role', 'Delete', json_encode($role), null, Auth::id(), Auth::user()->member_id);

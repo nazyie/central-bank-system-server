@@ -26,7 +26,16 @@ class WebAuditTrailController extends Controller
             ->selectRaw('audit_trails.id, audit_trails.domain, audit_trails.action, members.code, users.name, audit_trails.created_at')
             ->leftJoin('members', 'members.id', 'audit_trails.member_id')
             ->leftJoin('users', 'users.id', 'audit_trails.created_by')
+            ->where('audit_trails.member_id', Auth::user()->member_id)
             ->simplePaginate(10);
+
+        if (Auth::user()->member_id == 1) {
+            $auditTrail = DB::table('audit_trails')
+                ->selectRaw('audit_trails.id, audit_trails.domain, audit_trails.action, members.code, users.name, audit_trails.created_at')
+                ->leftJoin('members', 'members.id', 'audit_trails.member_id')
+                ->leftJoin('users', 'users.id', 'audit_trails.created_by')
+                ->simplePaginate(10);
+        }
 
         $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
                         ->leftJoin('roles', 'roles.member_id', 'members.id')

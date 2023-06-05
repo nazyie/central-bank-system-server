@@ -35,7 +35,16 @@ class WebUserController extends Controller
             ->selectRaw('users.id, users.name, users.email, members.code, roles.name as role_name, users.created_at, users.updated_at')
             ->leftJoin('members', 'members.id', 'users.member_id')
             ->leftJoin('roles', 'roles.id', 'users.role_id')
+            ->where('users.member_id', Auth::user()->member_id)
             ->simplePaginate(10);
+
+        if (Auth::user()->member_id == 1) {
+            $users = DB::table('users')
+                ->selectRaw('users.id, users.name, users.email, members.code, roles.name as role_name, users.created_at, users.updated_at')
+                ->leftJoin('members', 'members.id', 'users.member_id')
+                ->leftJoin('roles', 'roles.id', 'users.role_id')
+                ->simplePaginate(10);
+        }
 
         $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
                         ->leftJoin('roles', 'roles.member_id', 'members.id')
@@ -59,8 +68,14 @@ class WebUserController extends Controller
      */
     public function create()
     {
-        $roles = Role::select('id', 'name')->get();
-        $members = Member::select('id', 'name', 'code')->get();
+        $roles = Role::select('id', 'name')->where('member_id', Auth::user()->member_id)->get();
+        $members = Member::select('id', 'name', 'code')->where('id', Auth::user()->member_id)->get();
+
+        if (Auth::user()->member_id == 1) {
+            $roles = Role::select('id', 'name')->get();
+            $members = Member::select('id', 'name', 'code')->get();
+        }
+
         $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
                         ->leftJoin('roles', 'roles.member_id', 'members.id')
                         ->where('roles.id', Auth::user()->role_id)
@@ -100,6 +115,10 @@ class WebUserController extends Controller
             return redirect()->back()
                 ->withErrors($validated)
                 ->withInput();
+        }
+
+        if ($request->member_id !== Auth::user()->member_id) {
+            abort(403);
         }
 
         $user = User::create($request->all());
@@ -146,8 +165,14 @@ class WebUserController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        $roles = Role::select('id', 'name')->get();
-        $members = Member::select('id', 'name', 'code')->get();
+        $roles = Role::select('id', 'name')->where('member_id', Auth::user()->member_id)->get();
+        $members = Member::select('id', 'name', 'code')->where('id', Auth::user()->member_id)->get();
+
+        if (Auth::user()->member_id == 1) {
+            $roles = Role::select('id', 'name')->get();
+            $members = Member::select('id', 'name', 'code')->get();
+        }
+
         $userProfileInfo = Member::select('members.name AS member_name', 'roles.name as role_name', 'members.code AS member_code')
                         ->leftJoin('roles', 'roles.member_id', 'members.id')
                         ->where('roles.id', Auth::user()->role_id)
@@ -189,6 +214,12 @@ class WebUserController extends Controller
                 ->withInput();
         }
 
+        $request['password'] = Hash::make($request->password);
+
+        if ($request->member_id !== Auth::user()->member_id) {
+            abort(403);
+        }
+
         $user = User::findOrFail($id);
         $userPrev = User::findOrFail($id);
 
@@ -210,6 +241,9 @@ class WebUserController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
+        if ($user->member_id !== Auth::user()->member_id) {
+            abort(403);
+        }
         Session::flash('successAlert', 'The record has successfully deleted');
         $user->delete();
         AuditTrailService::create('User', 'Delete', json_encode($user), null, Auth::id(), Auth::user()->member_id);
