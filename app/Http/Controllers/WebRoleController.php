@@ -199,7 +199,7 @@ class WebRoleController extends Controller
 
         $role->update($request->all());
 
-        AuditTrailService::create('Role', 'Create', json_encode($prevRole), json_encode($role), Auth::id(), Auth::user()->member_id);
+        AuditTrailService::create('Role', 'Update', json_encode($prevRole), json_encode($role), Auth::id(), Auth::user()->member_id);
 
         RoleActionMapper::where('role_id', $role->id)->delete();
 
@@ -225,7 +225,7 @@ class WebRoleController extends Controller
         $role = Role::findOrFail($id);
         Session::flash('successAlert', 'The record has successfully deleted');
         $role->delete();
-        AuditTrailService::create('Role', 'Create', json_encode($role), null, Auth::id(), Auth::user()->member_id);
+        AuditTrailService::create('Role', 'Delete', json_encode($role), null, Auth::id(), Auth::user()->member_id);
         RoleActionMapper::where('role_id', $id)->delete();
         return redirect()->back();
     }

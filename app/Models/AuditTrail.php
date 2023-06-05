@@ -20,6 +20,7 @@ class AuditTrail extends Model
         'current_record',
         'created_by',
         'created_at',
+        'member_id',
     ];
 
     public static function getAllObject(Request $request) {

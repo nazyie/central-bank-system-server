@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('prev_record', 2000);
             $table->string('current_record', 2000)->nullable();
             $table->unsignedBigInteger('created_by');
+            $table->unsignedBigInteger('member_id');
             $table->timestamp('created_at');
         });
     }

@@ -31,7 +31,6 @@ class WebUserController extends Controller
      */
     public function index()
     {
-        // $users = User::simplePaginate(10);
         $users = DB::table('users')
             ->selectRaw('users.id, users.name, users.email, members.code, roles.name as role_name, users.created_at, users.updated_at')
             ->leftJoin('members', 'members.id', 'users.member_id')

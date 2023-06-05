@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\WebAuditTrailController;
 use App\Http\Controllers\WebDashboardController;
 use App\Http\Controllers\WebLoginController;
 use App\Http\Controllers\WebMemberController;
@@ -26,4 +27,5 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('member', WebMemberController::class, ['names' => ['index' => 'List of Members', 'show' => 'View Member', 'create' => 'Create Member', 'edit' => 'Update Member']]);
     Route::resource('user', WebUserController::class, ['names' => ['index' => 'List of Users', 'show' => 'View User', 'create' => 'Create User', 'edit' => 'Update User']]);
     Route::resource('role', WebRoleController::class, ['names' => ['index' => 'List of Roles', 'show' => 'View Role', 'create' => 'Create Role', 'edit' => 'Update Role']]);
+    Route::resource('audit-trail', WebAuditTrailController::class, ['names' => ['index' => 'List of Audit Trails', 'show' => 'View Audit Trail']]);
 });
