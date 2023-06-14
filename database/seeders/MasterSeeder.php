@@ -14,6 +14,15 @@ class MasterSeeder extends Seeder
      */
     public function run()
     {
-        //
+        // create action
+
+
+        // create member
+
+
+        // create user
+
+
+        // create role
     }
 }
