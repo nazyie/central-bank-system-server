@@ -50,7 +50,8 @@ class MemberController extends Controller
      */
     public function update(UpdateMemberRequest $request, $id)
     {
-        return Member::updateObject($request->all(), $id);
+        $member = Member::findObject($id);
+        return Member::updateObject($request->all(), $member);
     }
 
     /**
@@ -61,6 +62,7 @@ class MemberController extends Controller
      */
     public function destroy($id)
     {
-        return Member::deleteObject($id);
+        $member = Member::findObject($id);
+        return Member::deleteObject($member);
     }
 }
