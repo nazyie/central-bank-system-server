@@ -30,8 +30,7 @@ class ValidateUserAbilityBasedOnRole
                     ->count();
 
         if ($result == 0) {
-            // TODO: need to update this
-            dd("unathorized page");
+            abort(403);
         }
 
         return $next($request);

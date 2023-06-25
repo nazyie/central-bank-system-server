@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('description')->nullable();
             $table->unsignedBigInteger('member_id');
-            $table->unsignedBigInteger('role_id');
+            // $table->unsignedBigInteger('role_id');
             $table->timestamps();
             $table->string('created_by');
             $table->string('updated_by');
