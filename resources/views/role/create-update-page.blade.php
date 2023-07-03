@@ -13,7 +13,7 @@
             </div>
             <div class="mb-3">
                 <label for="descriptionInput" class="form-label">Description</label>
-                <input type="input" class="form-control" name="description" id="descriptionInput" value="{{ $hasValue ? $role->name : '' }}" @if($viewMode == 'view')disabled @endif>
+                <input type="input" class="form-control" name="description" id="descriptionInput" value="{{ $hasValue ? $role->description : '' }}" @if($viewMode == 'view')disabled @endif>
             </div>
             <div class="mb-3">
                 <label for="memberIdInput" class="form-label">Member Id</label>
