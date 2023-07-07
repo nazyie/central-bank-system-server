@@ -37,6 +37,9 @@ class MasterSeeder extends Seeder
             [ "function" => "Role", "id" => "view-role" ],
             [ "function" => "Role", "id" => "delete-role" ],
 
+            [ "function" => "Transaction", "id" => "create-transaction" ],
+            [ "function" => "Transaction", "id" => "view-transaction" ],
+
             [ "function" => "Audit Trail", "id" => "view-audit-trail" ],
         ];
 
@@ -206,6 +209,9 @@ class MasterSeeder extends Seeder
             [ 'role_id' => 2, 'action_id' => 'view-member'],
             [ 'role_id' => 2, 'action_id' => 'delete-member'],
 
+            [ 'role_id' => 2, 'action_id' => 'view-transaction'],
+            [ 'role_id' => 2, 'action_id' => 'create-transaction'],
+
             [ 'role_id' => 2, 'action_id' => 'view-audit-trail'],
 
             // analyst - view
@@ -214,6 +220,8 @@ class MasterSeeder extends Seeder
             [ 'role_id' => 3, 'action_id' => 'view-member'],
 
             [ 'role_id' => 3, 'action_id' => 'view-audit-trail'],
+
+            [ 'role_id' => 3, 'action_id' => 'view-transaction'],
 
             [ 'role_id' => 3, 'action_id' => 'view-role'],
 
@@ -241,12 +249,18 @@ class MasterSeeder extends Seeder
 
             [ 'role_id' => 5, 'action_id' => 'view-audit-trail'],
 
+            [ 'role_id' => 5, 'action_id' => 'view-transaction'],
+            [ 'role_id' => 5, 'action_id' => 'create-transaction'],
+
+
             // analyst - view
             [ 'role_id' => 6, 'action_id' => 'view-user'],
 
             [ 'role_id' => 6, 'action_id' => 'view-audit-trail'],
 
             [ 'role_id' => 6, 'action_id' => 'view-role'],
+
+            [ 'role_id' => 6, 'action_id' => 'view-transaction'],
         ];
 
         RoleActionMapper::insert($role_actions_mapper);

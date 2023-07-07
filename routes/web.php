@@ -5,6 +5,7 @@ use App\Http\Controllers\WebDashboardController;
 use App\Http\Controllers\WebLoginController;
 use App\Http\Controllers\WebMemberController;
 use App\Http\Controllers\WebRoleController;
+use App\Http\Controllers\WebTransactionController;
 use App\Http\Controllers\WebUserController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,4 +29,5 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('user', WebUserController::class, ['names' => ['index' => 'List of Users', 'show' => 'View User', 'create' => 'Create User', 'edit' => 'Update User']]);
     Route::resource('role', WebRoleController::class, ['names' => ['index' => 'List of Roles', 'show' => 'View Role', 'create' => 'Create Role', 'edit' => 'Update Role']]);
     Route::resource('audit-trail', WebAuditTrailController::class, ['names' => ['index' => 'List of Audit Trails', 'show' => 'View Audit Trail']]);
+    Route::resource('transaction', WebTransactionController::class, ['names' => ['index' => 'List of Transactions', 'show' => 'View Transaction', 'create' => 'Create Transaction', 'edit' => 'Update Transaction']]);
 });
