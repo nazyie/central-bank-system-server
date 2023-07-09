@@ -100,7 +100,7 @@ class WebRoleController extends Controller
             'member_id' => 'required',
         ]);
 
-        if ($request->member_id != Auth::user()->member_id) {
+        if (Auth::user()->member_id != 1 && $request->member_id != Auth::user()->member_id) {
             abort(403);
         }
 
@@ -231,7 +231,7 @@ class WebRoleController extends Controller
                 ->withInput();
         }
 
-        if(Auth::user()->member_id != $request->member_id) {
+        if (Auth::user()->member_id != 1 && $request->member_id != Auth::user()->member_id) {
             abort(403);
         }
 
