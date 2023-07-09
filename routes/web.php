@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::resource('sign-in', WebLoginController::class);
 Route::post('sign-out', [WebLoginController::class, 'destroy']);
+Route::post('verify-otp', [WebLoginController::class, 'verify']);
 
 Route::group(['middleware' => ['auth']], function () {
     Route::resource('dashboard', WebDashboardController::class, ['names' => ['index' => 'View Dashboard']]);

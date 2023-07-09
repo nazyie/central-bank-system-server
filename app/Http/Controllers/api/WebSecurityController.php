@@ -13,11 +13,11 @@ class WebSecurityController extends Controller
 {
     /**
      * Authenticate the user by using the membercode, username and password
-     * 
+     *
      * @param memberCode
      * @param username
      * @param password
-     * 
+     *
      */
     public function signIn(SignInRequest $request) {
         $member = Member::where('code', $request->memberCode)->first();
@@ -33,7 +33,7 @@ class WebSecurityController extends Controller
             return ErrorResponseService::invalidCredential();
         }
 
-        // clear the existing access token 
+        // clear the existing access token
         PersonalAccessToken::where('name', $user->id)->delete();
 
         // reload the ability from the action
@@ -42,7 +42,7 @@ class WebSecurityController extends Controller
 
         // invoke the token generation thru email
         if (env('ENABLE_OTP', false)) {
-            // TODO: need to invoke the OTP 
+            // TODO: need to invoke the OTP
         } else {
             $token = $user->createToken($user->id, $abilities)->plainTextToken;
             return $token;
@@ -51,7 +51,7 @@ class WebSecurityController extends Controller
 
     /**
      * Verify the OTP after the user sign in into the web
-     * 
+     *
      */
     public function verify() {
         //
